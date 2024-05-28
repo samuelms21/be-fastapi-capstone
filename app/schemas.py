@@ -34,4 +34,4 @@ class LoginResponse(BaseModel):
 
 
 class TokenData(BaseModel):
-    email: str | None = None
+    email: Optional[str] = None

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
-from auth import authenticate_user, create_access_token, get_current_user
+from .auth import authenticate_user, create_access_token, get_current_user
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -65,5 +65,5 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
         # "sub" means subject, which is the user email
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    
+
     return {"access_token": access_token, "token_type": "bearer", "user": user}

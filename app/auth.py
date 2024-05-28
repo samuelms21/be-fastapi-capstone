@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
+from typing import Optional
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-import crud
-import schemas
+import app.crud as crud
+import app.schemas as schemas
+import app.helpers as helpers
 
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
@@ -15,16 +17,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def authenticate_user(db: Session, email: str, password: str):
     user = crud.get_user_by_email(db, email)
-    if not user or not crud.verify_password(password, user.hashed_password):
+    if not user or not helpers.verify_password(password, user.hashed_password):
         return False
     return user
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(datetime.UTC) + expires_delta
+        expire = datetime.now() + expires_delta
     else:
-        expire = datetime.now(datetime.UTC)
+        expire = datetime.now()
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
