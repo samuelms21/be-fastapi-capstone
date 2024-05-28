@@ -3,13 +3,6 @@ from . import models, schemas
 from app.helpers import hash_password
 
 def create_user(db: Session, user: schemas.UserCreate):
-
-    # debug line
-    print("\ncreate_user from crud.py")
-    print(user.email, user.password)
-    print()
-    # debug line
-
     hashed_password = hash_password(user.password)
     db_user = models.User(email=user.email, hashed_password=hashed_password)
     db.add(db_user)

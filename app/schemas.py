@@ -2,14 +2,15 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     email: str
+
+class UserCreate(UserBase):
     password: str
 
 
-class UserResponse(BaseModel):
-    # id: int
-    email: str
+class UserResponse(UserBase):
+    id: int
     full_name: Optional[str] = None
     phone: Optional[str] = None
     location: Optional[str] = None
@@ -19,3 +20,18 @@ class UserResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserResponse
+
+
+class TokenData(BaseModel):
+    email: str | None = None
