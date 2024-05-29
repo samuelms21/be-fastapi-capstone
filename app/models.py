@@ -1,9 +1,15 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Date
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from .database import Base
 
+class BlacklistToken(Base):
+    __tablename__ = "blacklist_tokens"
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String, unique=True, index=True)
+    blacklisted_on = Column(DateTime, default=datetime.now())
 
 class User(Base):
     __tablename__ = "users"
