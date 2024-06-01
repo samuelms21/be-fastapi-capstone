@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -16,6 +17,37 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
+
+
+def save_user_info(db: Session, user: schemas.UserSave):
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update user info
+    db_user.full_name = user.full_name
+    db_user.phone = user.phone
+    db_user.location = user.location
+    db_user.education = user.education
+
+    # Update past job experience
+    for job_exp in user.job_experiences:
+        db_job_exp = db.query(models.JobExperience).filter(models.JobExperience.id_user == user.id).first()
+        if db_job_exp:
+            db_job_exp.company_name = job_exp.company_name
+            db_job_exp.job_title = job_exp.job_title
+        else:
+            new_job_exp = models.JobExperience(
+                id_user=user.id,
+                job_title=job_exp.job_title,
+                company_name=job_exp.company_name
+            )
+            db.add(new_job_exp)
+    
+    # Update Skills
+    for skill in user.skills:
+        db_skill = db.query(models.Skill)
 
 
 def add_token_to_blacklist(db: Session, token: str) -> bool:
