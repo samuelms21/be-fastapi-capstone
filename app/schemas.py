@@ -3,12 +3,12 @@ from typing import Optional, List
 from datetime import datetime
 
 class JobExperienceBase(BaseModel):
+    id_user: int
     job_title: str
     company_name: str
 
 class JobExperienceResponse(JobExperienceBase):
     id: int
-    id_user: int
     created_at: datetime
     updated_at: datetime
 
@@ -49,6 +49,10 @@ class UserSave(UserBase):
 
     job_experiences: Optional[List[JobExperienceBase]] = []
     skills: Optional[List[SkillBase]] = []
+
+    class Config:
+        orm_mode = True
+
 
 class UserResponse(UserBase):
     id: int

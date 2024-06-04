@@ -36,7 +36,6 @@ class JobExperience(Base):
     job_title = Column(String, nullable=False)
     company_name = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     user = relationship("User", back_populates="job_experiences")
 
@@ -47,7 +46,6 @@ class Skill(Base):
     id = Column(Integer, primary_key=True, index=True)
     id_user = Column(Integer, ForeignKey("users.id"), nullable=False)
     skill = Column(String, nullable=False)
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     created_at = Column(DateTime, server_default=func.now())
 
     user = relationship("User", back_populates="skills")

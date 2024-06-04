@@ -31,23 +31,41 @@ def save_user_info(db: Session, user: schemas.UserSave):
     db_user.location = user.location
     db_user.education = user.education
 
+    # Delete all existing job experience entries for the user
+    all_exps = db.query(models.JobExperience).filter(models.JobExperience.id_user == user.id).all()
+    if len(all_exps) > 0:
+        for item in all_exps:
+            db.delete(item)
+        db.commit()
+
     # Update past job experience
     for job_exp in user.job_experiences:
-        db_job_exp = db.query(models.JobExperience).filter(models.JobExperience.id_user == user.id).first()
-        if db_job_exp:
-            db_job_exp.company_name = job_exp.company_name
-            db_job_exp.job_title = job_exp.job_title
-        else:
-            new_job_exp = models.JobExperience(
-                id_user=user.id,
-                job_title=job_exp.job_title,
-                company_name=job_exp.company_name
+        # Create new job experiences from the PUT request
+        new_exp = models.JobExperience(
+            id_user=job_exp.id_user, 
+            job_title=job_exp.job_title,
+            company_name=job_exp.company_name
             )
-            db.add(new_job_exp)
-    
+        db.add(new_exp)
+
+    # Delete all existing skill entries for the user
+    all_skills = db.query(models.Skill).filter(models.Skill.id_user == user.id).all()
+    if len(all_skills) > 0:
+        for skill_ in all_skills:
+            db.delete(skill_)
+        db.commit()
+
     # Update Skills
     for skill in user.skills:
-        db_skill = db.query(models.Skill)
+        new_skill = models.Skill(
+            id_user=db_user.id,
+            skill=skill.skill,
+        )
+        db.add(new_skill)
+
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 
 def add_token_to_blacklist(db: Session, token: str) -> bool:

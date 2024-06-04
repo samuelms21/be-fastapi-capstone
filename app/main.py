@@ -17,11 +17,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# Allow specific origins
-origins = [
-    "http://10.237.56.244:8080",  # Add other origins as needed
-]
-
 # Allow all origins
 app.add_middleware(
     CORSMiddleware,
@@ -33,7 +28,7 @@ app.add_middleware(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Dependency
+# Dependencys
 def get_db():
     db = SessionLocal()
     try:
@@ -86,8 +81,6 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
     return {"access_token": access_token, "token_type": "bearer", "user": user}
 
 
-# async : depends on the function
-# needs to perform async operations like database queries using an async ORM
 @app.post("/users/logout/")
 def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     success = crud.add_token_to_blacklist(db, token)
@@ -97,3 +90,19 @@ def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
             detail="Token already blacklisted"
         )
     return {"msg": "Successfully logged out"}
+
+
+@app.put("/users/edit/", response_model=schemas.UserSave)
+def edit_user(user: schemas.UserSave, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    current_user = get_current_user(db, token)
+
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found."
+        )
+
+    updated_user = crud.save_user_info(db, user)
+
+    return updated_user
+    
