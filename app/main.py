@@ -87,7 +87,7 @@ def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token already blacklisted"
+            detail="blacklisted-token"
         )
     return {"msg": "Successfully logged out"}
 
@@ -99,7 +99,7 @@ def edit_user(user: schemas.UserSave, token: str = Depends(oauth2_scheme), db: S
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found."
+            detail="user-not-found"
         )
 
     updated_user = crud.save_user_info(db, user)
