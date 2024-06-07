@@ -57,11 +57,12 @@ class UserSave(UserBase):
 class UserResponse(UserBase):
     id: int
     full_name: Optional[str] = None
-    phone: Optional[str] = None
+    phone: Optional[str] = None  
     location: Optional[str] = None
     education: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
+
+    job_experiences: Optional[List[JobExperienceBase]] = []
+    skills: Optional[List[SkillBase]] = []
 
     class Config:
         orm_mode = True
